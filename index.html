@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+nó<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -98,7 +98,7 @@
             ctx.drawImage(borderImage, 0, 0, canvas.width, canvas.height);
         };
 
-        let scaleFactor = 1; // Tỉ lệ phóng to mặc định
+        let scaleFactor = 1; 
 
         function loadImage(event) {
             const file = event.target.files[0];
@@ -138,29 +138,29 @@
         }
 
         function downloadImage() {
-            // Tạo một canvas phụ để cắt ảnh thành hình tròn
+            
             const circleCanvas = document.createElement('canvas');
             const circleCtx = circleCanvas.getContext('2d');
 
-            // Kích thước của canvas phụ giống như canvas chính
+            
             circleCanvas.width = canvas.width;
             circleCanvas.height = canvas.height;
 
-            // Tạo vùng cắt hình tròn
+            
             circleCtx.beginPath();
             circleCtx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
             circleCtx.clip();
 
-            // Vẽ ảnh vào canvas phụ
+            
             const img = new Image();
             img.src = canvas.toDataURL('image/png');
             img.onload = function() {
                 circleCtx.drawImage(img, 0, 0);
 
-                // Vẽ viền lên canvas phụ
+            
                 circleCtx.drawImage(borderImage, 0, 0, circleCanvas.width, circleCanvas.height);
 
-                // Xuất ảnh từ canvas phụ
+                
                 const dataURL = circleCanvas.toDataURL('image/png', 1.0);
                 const link = document.createElement('a');
                 link.href = dataURL;
