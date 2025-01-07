@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghép Viền Vào Avatar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+            flex-direction: column;
+        }
+
+        #container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #canvasContainer {
+            width: 90%;
+            max-width: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            border: 2px solid #3498db;
+            border-radius: 50%;
+            box-sizing: border-box;
+        }
+
+        #uploadButton, #downloadButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        #zoomSlider {
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Ghép Viền Vào Avatar</h1>
+
+        <div id="canvasContainer">
+            <canvas id="canvas" width="400" height="400"></canvas>
+        </div>
+
+        <label for="fileInput" id="uploadButton">Chọn ảnh</label>
+        <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
+
+        <button id="downloadButton" onclick="downloadImage()">Tải ảnh</button>
+
+        <input type="range" id="zoomSlider" min="1" max="3" step="0.01" value="1" onchange="updateZoom()">
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const borderImage = new Image();
+        borderImage.src = './frame.png';
+
+        const canvasResolutionMultiplier = 10;
+
+        canvas.width = 400 * canvasResolutionMultiplier;
+        canvas.height = 400 * canvasResolutionMultiplier;
+
+        canvas.style.width = "100%";
+        canvas.style.height = "auto";
+
+        borderImage.onload = () => {
+            ctx.drawImage(borderImage, 0, 0, canvas.width, canvas.height);
+        };
+
+        let scaleFactor = 1; // Tỉ lệ phóng to mặc định
+
+        function loadImage(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const userImage = new Image();
+                userImage.src = e.target.result;
+
+                userImage.onload = function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    drawImageWithScale(userImage, scaleFactor);
+                };
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function drawImageWithScale(userImage, scale) {
+            const width = userImage.width * scale;
+            const height = userImage.height * scale;
+            const x = (canvas.width - width) / 2;
+            const y = (canvas.height - height) / 2;
+            ctx.drawImage(userImage, x, y, width, height);
+            ctx.drawImage(borderImage, 0, 0, canvas.width, canvas.height);
+        }
+
+        function updateZoom() {
+            const zoomValue = document.getElementById('zoomSlider').value;
+            scaleFactor = zoomValue;
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files[0]) {
+                loadImage({ target: { files: [fileInput.files[0]] } });
+            }
+        }
+
+        function downloadImage() {
+            const dataURL = canvas.toDataURL('image/png', 1.0);
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'avatar_with_border.png';
+            link.click();
+        }
+    </script>
+</body>
+</html>
